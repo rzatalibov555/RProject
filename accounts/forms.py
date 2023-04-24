@@ -17,7 +17,7 @@ class LoginForm(forms.ModelForm):
         password = self.cleaned_data.get("password")
 
         user = authenticate(username=username, password=password)
-        print(user)
+        # print(user)
 
         if not user:
             raise forms.ValidationError("Username or password is wrong!")
