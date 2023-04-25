@@ -36,8 +36,17 @@ class Product(DateMixin):
     def __str__(self):
         return self.name
 
+
+    def get_new_slug(self, index=0):
+        return slugify(self.name) if index == 0 else f"{slugify(self.name)}-{index}"
+
+    def unique_slug_generator(self, index):
+        new_slug = self.get_new_slug(index)
+        return new_slug if not Product.objects.filter(slug=new_slug).exists() else self.unique_slug_generator(index + 1)
+
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)+"-"+get_random_string(length=4)
+        if not self.slug:
+            self.slug = self.unique_slug_generator(index=0)
         return super().save(*args, **kwargs)
 
 
