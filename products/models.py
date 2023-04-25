@@ -1,6 +1,8 @@
 from django.db import models
 
 # Create your models here.
+from django.template.defaultfilters import slugify
+from django.utils.crypto import get_random_string
 
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
@@ -25,6 +27,7 @@ class Category(MPTTModel, DateMixin):
 class Product(DateMixin):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    slug = models.SlugField(null=True, blank=True, unique=True)
     name = models.CharField(max_length=300)
     description = RichTextField(blank=True, null=True)
     price = models.FloatField()
@@ -33,6 +36,9 @@ class Product(DateMixin):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)+"-"+get_random_string(length=4)
+        return super().save(*args, **kwargs)
 
 
 class ProductImage(DateMixin):
